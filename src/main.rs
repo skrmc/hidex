@@ -1,5 +1,3 @@
-use chrono::Local;
-use env_logger::Builder;
 use evdev::{Device, EventSummary, KeyCode, RelativeAxisCode};
 use log::{debug, error, info};
 use nix::poll::{PollFd, PollFlags, PollTimeout, poll};
@@ -38,20 +36,6 @@ impl Report {
         self.wheel = 0;
         self.hwheel = 0;
     }
-}
-
-fn init_log() {
-    Builder::from_env(env_logger::Env::default())
-        .format(|buf, rec| {
-            writeln!(
-                buf,
-                "{} [{}] {}",
-                Local::now().format("%Y-%m-%d %H:%M:%S%.3f"),
-                rec.level(),
-                rec.args()
-            )
-        })
-        .init();
 }
 
 fn write_gadget(
@@ -135,7 +119,7 @@ fn modify_btn(pressed: bool, btn: &mut u8, mask: u8) {
 }
 
 fn main() -> Result<(), Error> {
-    init_log();
+    env_logger::init();
     info!("Starting mouse adapter");
 
     let mut device = Device::open(INPUT_PATH).map_err(|e| {
